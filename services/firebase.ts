@@ -22,7 +22,7 @@ import { Route, User } from '../types';
 //    REACT_APP_FIREBASE_APP_ID="your-app-id"
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCVaX3GANQbiDBkE4tI-tRCM2Q1KiIkujU",
+  apiKey: "---",
   authDomain: "strollpath-9f35f.firebaseapp.com",
   projectId: "strollpath-9f35f",
   storageBucket: "strollpath-9f35f.appspot.com",

@@ -135,7 +135,7 @@ Navigating cities with a stroller is a daily challenge for millions of parents a
 ## 🎥 Demo
 
 ### Live Application
-🌐 **[https://strollpath.tech](https://strollpath.tech)**
+🌐 **[https://strollpath.tech](https://www.strollpath.tech)**
 
 
 ---

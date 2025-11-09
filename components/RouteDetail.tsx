@@ -18,6 +18,7 @@ import { getWarmImageUrl } from '../utils/imageUtils';
 interface RouteDetailProps {
   route: Route;
   author: User;
+  currentUser: User;
   onBack: () => void;
   onLike: (routeId: string) => void;
   onShare: (route: Route) => void;
@@ -25,7 +26,7 @@ interface RouteDetailProps {
   onViewProfile: (authorId: string) => void;
 }
 
-const RouteDetail: React.FC<RouteDetailProps> = ({ route, author, onBack, onLike, onShare, onEdit, onViewProfile }) => {
+const RouteDetail: React.FC<RouteDetailProps> = ({ route, author, currentUser, onBack, onLike, onShare, onEdit, onViewProfile }) => {
 
   const handleViewOnMap = () => {
     const url = generateGoogleMapsUrl(route);
@@ -100,7 +101,7 @@ const RouteDetail: React.FC<RouteDetailProps> = ({ route, author, onBack, onLike
                 <span>{route.likes}</span>
             </button>
             <div className="flex items-center gap-2">
-                {author.id === 'user-you' && (
+                {author.id === currentUser.id && (
                   <button
                     onClick={onEdit}
                     className="flex items-center gap-2 bg-slate-100 text-slate-700 font-bold py-2 px-4 rounded-lg hover:bg-slate-200 transition-colors"

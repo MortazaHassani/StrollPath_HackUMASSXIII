@@ -3,6 +3,13 @@ export interface Coordinate {
   lng: number;
 }
 
+export interface UserActivity {
+    [date: string]: { // YYYY-MM-DD
+        steps: number;
+        routeId?: string;
+    };
+}
+
 export interface User {
   id: string;
   name: string;
@@ -10,13 +17,16 @@ export interface User {
   following: string[]; // Array of user IDs
   followers: string[]; // Array of user IDs
   isSearchable?: boolean;
+  likedRoutes?: string[];
+  dailyStepGoal?: number;
+  activity?: UserActivity;
 }
 
 export interface Route {
   id: string;
   name: string;
   description: string;
-  distance: number; // in kilometers
+  distance: number; // in miles
   estimatedTime: number; // in minutes
   path: Coordinate[];
   isPublic: boolean;

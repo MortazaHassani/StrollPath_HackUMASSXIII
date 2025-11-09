@@ -6,6 +6,7 @@ import PencilIcon from './icons/PencilIcon';
 import CheckIcon from './icons/CheckIcon';
 import XIcon from './icons/XIcon';
 import UserListModal from './UserListModal';
+import SpinnerIcon from './icons/SpinnerIcon';
 
 
 interface ProfileProps {
@@ -17,7 +18,8 @@ interface ProfileProps {
   onSelectRoute: (routeId: string) => void;
   onLike: (routeId: string) => void;
   onShare: (route: Route) => void;
-  onProfileImageChange: (url: string) => void;
+  onProfileImageChange: (file: File) => void;
+  isUploadingProfileImage: boolean;
   onUsernameChange: (newName: string) => void;
   onSearchabilityChange: (isSearchable: boolean) => void;
   dailyStepGoal: number;
@@ -37,6 +39,7 @@ const Profile: React.FC<ProfileProps> = ({
     onLike, 
     onShare, 
     onProfileImageChange,
+    isUploadingProfileImage,
     onUsernameChange,
     onSearchabilityChange,
     dailyStepGoal,
@@ -55,11 +58,7 @@ const Profile: React.FC<ProfileProps> = ({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
         const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            onProfileImageChange(reader.result as string);
-        };
-        reader.readAsDataURL(file);
+        onProfileImageChange(file);
     }
   };
 
@@ -86,7 +85,7 @@ const Profile: React.FC<ProfileProps> = ({
   return (
     <div className="animate-fade-in">
         <div className="text-center mb-6">
-            <div className="relative w-24 h-24 mx-auto mb-4">
+            <div className="relative w-24 h-24 mx-auto mb-4 group">
                 {user.imageUrl ? (
                     <img src={user.imageUrl} alt={user.name} className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md" />
                 ) : (
@@ -94,9 +93,14 @@ const Profile: React.FC<ProfileProps> = ({
                         <UserIcon className="w-12 h-12 text-slate-500" />
                     </div>
                 )}
-                {isCurrentUser && (
+                {isUploadingProfileImage && (
+                    <div className="absolute inset-0 bg-black bg-opacity-60 rounded-full flex items-center justify-center">
+                        <SpinnerIcon className="w-8 h-8 text-white animate-spin" />
+                    </div>
+                )}
+                {isCurrentUser && !isUploadingProfileImage && (
                   <>
-                    <label htmlFor="profile-pic-upload" className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center text-white opacity-0 hover:opacity-100 transition-opacity cursor-pointer font-semibold text-sm">
+                    <label htmlFor="profile-pic-upload" className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer font-semibold text-sm">
                         Change
                     </label>
                     <input 
@@ -105,6 +109,7 @@ const Profile: React.FC<ProfileProps> = ({
                         className="hidden"
                         accept="image/*"
                         onChange={handleImageChange}
+                        disabled={isUploadingProfileImage}
                     />
                   </>
                 )}
@@ -182,7 +187,7 @@ const Profile: React.FC<ProfileProps> = ({
                         ) : (
                             <div className="flex justify-between items-center">
                                 <p className="text-2xl font-bold text-slate-800">{dailyStepGoal.toLocaleString()} <span className="text-base font-normal text-slate-500">steps</span></p>
-                                <button onClick={() => setIsEditingGoal(true)} className="flex items-center gap-1.5 text-sm font-semibold text-amber-500 hover:text-amber-700">
+                                <button onClick={() => {setIsEditingGoal(true); setTempGoal(dailyStepGoal);}} className="flex items-center gap-1.5 text-sm font-semibold text-amber-500 hover:text-amber-700">
                                     <PencilIcon className="w-4 h-4" />
                                     Edit
                                 </button>

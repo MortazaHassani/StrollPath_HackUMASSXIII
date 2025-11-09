@@ -7,8 +7,8 @@ import SparklesIcon from './icons/SparklesIcon';
 
 interface CreateRouteFormProps {
   onClose: () => void;
-  onSave: (route: Omit<Route, 'id' | 'likes' | 'authorId'>) => void;
-  onUpdate?: (updatedData: Partial<Route>) => void;
+  onSave: (route: Omit<Route, 'id' | 'likes' | 'authorId' | 'isLiked' | 'imageUrl'> & { imageFile?: File }) => void;
+  onUpdate?: (updatedData: Partial<Omit<Route, 'imageUrl'>> & { imageFile?: File | null }) => void;
   editingRoute?: Route | null;
 }
 
@@ -21,6 +21,7 @@ const CreateRouteForm: React.FC<CreateRouteFormProps> = ({ onClose, onSave, onUp
   const [isPublic, setIsPublic] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -59,12 +60,19 @@ const CreateRouteForm: React.FC<CreateRouteFormProps> = ({ onClose, onSave, onUp
 
     if (editingRoute) {
         if(onUpdate) {
+            let imageFileUpdate: File | null | undefined = undefined; // undefined: no change
+            if (imageFile) {
+                imageFileUpdate = imageFile; // new image
+            } else if (!imagePreview && editingRoute.imageUrl) {
+                imageFileUpdate = null; // image removed
+            }
+
             onUpdate({
                 name,
                 description,
                 tags: tags.split(',').map(tag => tag.trim()).filter(Boolean),
                 isPublic,
-                imageUrl: imagePreview ?? undefined,
+                imageFile: imageFileUpdate,
             });
         }
     } else {
@@ -80,7 +88,7 @@ const CreateRouteForm: React.FC<CreateRouteFormProps> = ({ onClose, onSave, onUp
             path,
             isPublic,
             tags: tags.split(',').map(tag => tag.trim()).filter(Boolean),
-            imageUrl: imagePreview ?? undefined,
+            imageFile: imageFile ?? undefined,
         });
     }
   };
@@ -105,6 +113,7 @@ const CreateRouteForm: React.FC<CreateRouteFormProps> = ({ onClose, onSave, onUp
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -115,6 +124,12 @@ const CreateRouteForm: React.FC<CreateRouteFormProps> = ({ onClose, onSave, onUp
 
   const handleAddPhotoClick = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleRemovePhoto = () => {
+    setImagePreview(null);
+    setImageFile(null);
+    if(fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const MILES_TO_FEET = 5280;
@@ -163,10 +178,7 @@ const CreateRouteForm: React.FC<CreateRouteFormProps> = ({ onClose, onSave, onUp
                                   <img src={imagePreview} alt="Route preview" className="w-full h-full object-cover rounded-lg" />
                                   <button 
                                       type="button" 
-                                      onClick={() => {
-                                          setImagePreview(null);
-                                          if(fileInputRef.current) fileInputRef.current.value = '';
-                                      }} 
+                                      onClick={handleRemovePhoto}
                                       className="absolute top-2 right-2 bg-white bg-opacity-75 p-1 rounded-full text-slate-800 hover:bg-opacity-100"
                                       aria-label="Remove photo"
                                   >

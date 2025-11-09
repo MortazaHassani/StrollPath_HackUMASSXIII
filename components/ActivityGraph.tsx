@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { MOCK_ACTIVITY_DATA } from '../data';
+import { UserActivity } from '../types';
 import MapPinIcon from './icons/MapPinIcon';
 import ArrowLeftIcon from './icons/ArrowLeftIcon';
 import ArrowRightIcon from './icons/ArrowRightIcon';
 
 interface ActivityGraphProps {
     onSelectRoute: (routeId: string) => void;
+    activity?: UserActivity;
 }
 
-const ActivityGraph: React.FC<ActivityGraphProps> = ({ onSelectRoute }) => {
-  const [currentDate, setCurrentDate] = useState(new Date('2024-07-16')); // Set to a date with mock data
+const ActivityGraph: React.FC<ActivityGraphProps> = ({ onSelectRoute, activity = {} }) => {
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
   const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
@@ -49,18 +50,18 @@ const ActivityGraph: React.FC<ActivityGraphProps> = ({ onSelectRoute }) => {
                 if (!day) return <div key={`empty-${index}`} className="aspect-square"></div>;
                 
                 const dateString = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
-                const activity = MOCK_ACTIVITY_DATA[dateString];
+                const dayActivity = activity[dateString];
                 const isToday = new Date().toDateString() === day.toDateString();
 
                 return (
                 <div key={day.toISOString()} className={`aspect-square border rounded-lg p-1.5 flex flex-col justify-between text-left text-xs md:text-sm ${isToday ? 'bg-amber-50 border-amber-200' : 'border-slate-200'}`}>
                     <span className={`font-bold ${isToday ? 'text-amber-500' : 'text-slate-700'}`}>{day.getDate()}</span>
-                    {activity && (
+                    {dayActivity && (
                     <div className="mt-auto">
-                        <p className="font-semibold text-slate-800 leading-tight">{(activity.steps / 1000).toFixed(1)}k</p>
+                        <p className="font-semibold text-slate-800 leading-tight">{(dayActivity.steps / 1000).toFixed(1)}k</p>
                         <p className="text-slate-500 leading-tight">steps</p>
-                        {activity.routeId && (
-                           <button onClick={() => onSelectRoute(activity.routeId!)} className="mt-1 text-amber-500 hover:text-amber-700 w-full flex justify-end">
+                        {dayActivity.routeId && (
+                           <button onClick={() => onSelectRoute(dayActivity.routeId!)} className="mt-1 text-amber-500 hover:text-amber-700 w-full flex justify-end">
                              <MapPinIcon className="w-4 h-4" />
                            </button>
                         )}
@@ -75,10 +76,3 @@ const ActivityGraph: React.FC<ActivityGraphProps> = ({ onSelectRoute }) => {
 };
 
 export default ActivityGraph;
-
-// Simple ArrowRightIcon for calendar navigation
-const ArrowRightIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" {...props}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-  </svg>
-);

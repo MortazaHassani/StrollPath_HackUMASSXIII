@@ -78,9 +78,10 @@ export default function useGeolocation() {
             const newTotalPath = [...prevPath, newCoord];
             if (newTotalPath.length > 1) {
               const lastCoord = newTotalPath[newTotalPath.length - 2];
-              const newDistance = prevDistance => prevDistance + haversineDistance(lastCoord, newCoord);
-              setDistance(newDistance);
-              setSteps(newDistance(distance) * STEPS_PER_MILE);
+              // FIX: Incrementally update distance and steps to avoid using stale state.
+              const distanceIncrement = haversineDistance(lastCoord, newCoord);
+              setDistance(d => d + distanceIncrement);
+              setSteps(s => s + distanceIncrement * STEPS_PER_MILE);
             }
             return newTotalPath;
           });
@@ -95,7 +96,7 @@ export default function useGeolocation() {
         maximumAge: 0,
       }
     );
-  }, [resetState, stopRecording, distance]);
+  }, [resetState, stopRecording]);
 
   return { isRecording, startRecording, stopRecording, path, distance, steps, elapsedTime, error };
 }

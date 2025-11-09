@@ -1,0 +1,7 @@
+{
+  "name": "Stroll Path",
+  "description": "A walking route recommendation and tracking application. Discover, create, and share your favorite walking paths with a vibrant community. Record your walks using GPS, tag them by atmosphere, and get AI-powered descriptions for your routes.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
